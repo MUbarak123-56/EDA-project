@@ -6,4 +6,4 @@
 - Anna Cameron
 - Enya Tan
 - Mubarak Ganiyu
-- Sriran Kanaan
+- Sriram Kannan
