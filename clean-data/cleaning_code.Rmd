@@ -8,7 +8,10 @@ output: html_document
 
 ```{r}
 library(readr)
+
 tcc_ceds_music <- read_csv("~/Documents/EDA/tcc_ceds_music.csv")
+tcc_ceds_music_cleaned <- read_csv("~/Documents/EDA/tcc_ceds_music.csv")
+
 View(tcc_ceds_music)
 ```
 
