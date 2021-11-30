@@ -96,14 +96,3 @@ rename_with(music_cleaned, toupper)
 
 
 
-
-In variable 'topic', there are several possible wrong/useless types.
-```{r}
-unique(tcc_ceds_music$topic)
-
-tcc_ceds_music_cleaned = tcc_ceds_music_cleaned %>%
-  filter(topic == "sadness"|topic == "world/life"|topic == "music"|topic == "romantic"|topic == "violence"|topic == "obscene"|topic == "night/time"|topic == "feelings")
-```
-
-
-
