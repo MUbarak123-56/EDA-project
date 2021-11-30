@@ -10,7 +10,7 @@ library(readr)
 library(janitor)
 music <- read_csv("~/Documents/EDA/tcc_ceds_music.csv")%>%
   clean_names()
-View(tcc_ceds_music)
+View(music)
 ```
 
 checking assertions
@@ -34,6 +34,20 @@ music%>%
 music%>%
   assert(not_na, artist_name:age)
 
+```
+
+
+```{r}
+music = na.omit(music)
+#Min-Max Scaling 
+normalize <- function(x) {
+return ((x - min(x)) / (max(x) - min(x)))
+}
+
+Length_norm=normalize(music$len)
+
+music<- music %>%
+  mutate(Length_norm)
 ```
 
 
