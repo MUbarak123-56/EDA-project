@@ -7,29 +7,31 @@ output: html_document
 import data
 ```{r}
 library(readr)
-tcc_ceds_music <- read_csv("~/Documents/EDA/tcc_ceds_music.csv")
+library(janitor)
+music <- read_csv("~/Documents/EDA/tcc_ceds_music.csv")%>%
+  clean_names()
 View(tcc_ceds_music)
 ```
 
 checking assertions
 ```{r}
-library(dplyr)
+library(tidyverse)
 library(assertr)
-library(ggplot2)
+library(corrplot)
 
 #initial exploration of variables
-class(tcc_ceds_music)
+class(music)
 
-tcc_ceds_music%>%
+music%>%
   summarise(min(release_date), max(release_date))
 
 #check that values are between 0-1 for acousticness, instrumentalness, valence, energy, and age
-tcc_ceds_music%>%
+music%>%
   assert(within_bounds(0,1), acousticness:energy)%>%
   assert(within_bounds(0,1), age)
 
 #check for NAs
-tcc_ceds_music%>%
+music%>%
   assert(not_na, artist_name:age)
 
 ```
@@ -37,7 +39,26 @@ tcc_ceds_music%>%
 
 remove unwanted variables after checking correlations
 ```{r}
+music <- music %>%
+  select(-x1)
+music <- music %>% 
+  mutate(id = 1) %>% 
+  mutate(id = cumsum(id))
+head(music)
 
+new_t <- music %>% 
+  select(dating:energy)
+colnames(new_t)
+
+new_t$valence = as.numeric(new_t$valence)
+new_t$energy = as.numeric(new_t$energy)
+
+# delete NAs
+
+new_t = na.omit(new_t)
+
+# scatterplot matrix of the audio feature parameters
+corrplot(cor(new_t))
 ```
 
 
