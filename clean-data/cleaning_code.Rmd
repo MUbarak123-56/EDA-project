@@ -12,11 +12,9 @@ library(janitor)
 music <- read_csv("~/Documents/EDA/tcc_ceds_music.csv")%>%
   clean_names()
 View(music)
-
 ```
 
 # Checking Assertions
-
 ```{r}
 library(tidyverse)
 library(assertr)
@@ -47,14 +45,12 @@ music%>%
 ```
 
 # Change Characteristic Types to Numeric Types for Variables
-
 ```{r}
-tcc_ceds_music_cleaned$valence = as.numeric(tcc_ceds_music_cleaned$valence)
-tcc_ceds_music_cleaned$energy = as.numeric(tcc_ceds_music_cleaned$energy)
+music$valence = as.numeric(music$valence)
+music$energy = as.numeric(music$energy)
 ```
 
-# Delete NAs
-
+# check for NAs
 ```{r}
 music = na.omit(music)
 #Min-Max Scaling 
@@ -69,10 +65,9 @@ music<- music %>%
 ```
 
 
-remove unwanted variables after checking correlations
+# checking correlations
 ```{r}
-music <- music %>%
-  select(-x1)
+
 music <- music %>% 
   mutate(id = 1) %>% 
   mutate(id = cumsum(id))
@@ -85,18 +80,24 @@ colnames(new_t)
 new_t$valence = as.numeric(new_t$valence)
 new_t$energy = as.numeric(new_t$energy)
 
-# delete NAs
-
-new_t = na.omit(new_t)
-
 # scatterplot matrix of the audio feature parameters
 corrplot(cor(new_t))
 
+```
+# remove unwanted variables & capitalize column names 
+```{r}
+music_cleaned<-music%>%
+  select(id, artist_name:len, danceability:Length_norm)
+
+rename_with(music_cleaned, toupper)
 
 ```
 
-In variable 'topic', there are several possible wrong/useless types.
 
+
+
+
+In variable 'topic', there are several possible wrong/useless types.
 ```{r}
 unique(tcc_ceds_music$topic)
 
