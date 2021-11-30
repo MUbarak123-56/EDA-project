@@ -6,50 +6,11 @@ output: html_document
 
 ```{r}
 library(readr)
-tcc_ceds_music <- read_csv("~/Documents/EDA/tcc_ceds_music.csv")
-View(tcc_ceds_music)
+music_cleaned <- read_csv("clean-data/tcc_ceds_music_cleaned.csv")
+View(music_cleaned)
 ```
 #  What factors influence changes in music trends over time?
 
-## data cleaning/wrangling
-```{r}
-library(dplyr)
-library(assertr)
-library(ggplot2)
-
-#initial exploration of variables
-class(tcc_ceds_music)
-
-tcc_ceds_music%>%
-  summarise(min(release_date), max(release_date))
-
-#check that values are between 0-1 for acousticness, instrumentalness, valence, energy, and age
-tcc_ceds_music%>%
-  assert(within_bounds(0,1), acousticness:energy)%>%
-  assert(within_bounds(0,1), age)
-```
-
-
-#correlation explorations  (**** next to strongest relationships)
-```{r}
-#correlations with valence
-cor(tcc_ceds_music$valence, tcc_ceds_music$energy, use="everything", method="pearson")
-cor(tcc_ceds_music$valence, tcc_ceds_music$danceability, use="everything", method="pearson") #****
-cor(tcc_ceds_music$valence, tcc_ceds_music$loudness, use="everything", method="pearson")
-
-#correlations with age
-cor(tcc_ceds_music$age, tcc_ceds_music$acousticness, use="everything", method="pearson")  #****
-cor(tcc_ceds_music$age, tcc_ceds_music$instrumentalness, use="everything", method="pearson")
-cor(tcc_ceds_music$age, tcc_ceds_music$danceability, use="everything", method="pearson")
-cor(tcc_ceds_music$age, tcc_ceds_music$energy, use="everything", method="pearson")
-cor(tcc_ceds_music$age, tcc_ceds_music$loudness, use="everything", method="pearson") #****
-
-#correlations with loudness
-cor(tcc_ceds_music$loudness, tcc_ceds_music$acousticness, use="everything", method="pearson") 
-cor(tcc_ceds_music$loudness, tcc_ceds_music$energy, use="everything", method="pearson") #**** BEST ONE YET
-cor(tcc_ceds_music$loudness, tcc_ceds_music$instrumentalness, use="everything", method="pearson") 
-
-```
 
 
 
