@@ -4,20 +4,24 @@ output: html_document
 ---
 
 
-import data
+# Import Data
+
 ```{r}
 library(readr)
 library(janitor)
 music <- read_csv("~/Documents/EDA/tcc_ceds_music.csv")%>%
   clean_names()
 View(music)
+
 ```
 
-checking assertions
+# Checking Assertions
+
 ```{r}
 library(tidyverse)
 library(assertr)
 library(corrplot)
+
 
 #initial exploration of variables
 class(music)
@@ -36,6 +40,20 @@ music%>%
 
 ```
 
+# Remove Unwanted Variables after Checking Correlations
+
+```{r}
+
+```
+
+# Change Characteristic Types to Numeric Types for Variables
+
+```{r}
+tcc_ceds_music_cleaned$valence = as.numeric(tcc_ceds_music_cleaned$valence)
+tcc_ceds_music_cleaned$energy = as.numeric(tcc_ceds_music_cleaned$energy)
+```
+
+# Delete NAs
 
 ```{r}
 music = na.omit(music)
@@ -73,8 +91,18 @@ new_t = na.omit(new_t)
 
 # scatterplot matrix of the audio feature parameters
 corrplot(cor(new_t))
+
+
 ```
 
+In variable 'topic', there are several possible wrong/useless types.
+
+```{r}
+unique(tcc_ceds_music$topic)
+
+tcc_ceds_music_cleaned = tcc_ceds_music_cleaned %>%
+  filter(topic == "sadness"|topic == "world/life"|topic == "music"|topic == "romantic"|topic == "violence"|topic == "obscene"|topic == "night/time"|topic == "feelings")
+```
 
 
 
