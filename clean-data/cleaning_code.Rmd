@@ -1,0 +1,45 @@
+---
+title: "data cleaning"
+output: html_document
+---
+
+
+import data
+```{r}
+library(readr)
+tcc_ceds_music <- read_csv("~/Documents/EDA/tcc_ceds_music.csv")
+View(tcc_ceds_music)
+```
+
+checking assertions
+```{r}
+library(dplyr)
+library(assertr)
+library(ggplot2)
+
+#initial exploration of variables
+class(tcc_ceds_music)
+
+tcc_ceds_music%>%
+  summarise(min(release_date), max(release_date))
+
+#check that values are between 0-1 for acousticness, instrumentalness, valence, energy, and age
+tcc_ceds_music%>%
+  assert(within_bounds(0,1), acousticness:energy)%>%
+  assert(within_bounds(0,1), age)
+
+#check for NAs
+tcc_ceds_music%>%
+  assert(not_na, artist_name:age)
+
+```
+
+
+remove unwanted variables after checking correlations
+```{r}
+
+```
+
+
+
+
