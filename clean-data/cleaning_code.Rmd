@@ -20,7 +20,6 @@ library(tidyverse)
 library(assertr)
 library(corrplot)
 
-
 #initial exploration of variables
 class(music)
 
@@ -38,17 +37,6 @@ music%>%
 
 ```
 
-# Remove Unwanted Variables after Checking Correlations
-
-```{r}
-
-```
-
-# Change Characteristic Types to Numeric Types for Variables
-```{r}
-music$valence = as.numeric(music$valence)
-music$energy = as.numeric(music$energy)
-```
 
 # check for NAs
 ```{r}
@@ -58,27 +46,23 @@ normalize <- function(x) {
 return ((x - min(x)) / (max(x) - min(x)))
 }
 
+#new variables added 
 Length_norm=normalize(music$len)
 
 music<- music %>%
-  mutate(Length_norm)
+  mutate(Length_norm)%>%
+  mutate(age_actual = 2019 - release_date)%>% 
+  mutate(id = 1) %>% 
+  mutate(id = cumsum(id))
 ```
 
 
 # checking correlations
 ```{r}
 
-music <- music %>% 
-  mutate(id = 1) %>% 
-  mutate(id = cumsum(id))
-head(music)
-
 new_t <- music %>% 
-  select(dating:energy)
+  select(age, dating:energy, Length_norm)
 colnames(new_t)
-
-new_t$valence = as.numeric(new_t$valence)
-new_t$energy = as.numeric(new_t$energy)
 
 # scatterplot matrix of the audio feature parameters
 corrplot(cor(new_t))
@@ -87,12 +71,16 @@ corrplot(cor(new_t))
 # remove unwanted variables & capitalize column names 
 ```{r}
 music_cleaned<-music%>%
-  select(id, artist_name:len, danceability:Length_norm)
+  select(id, artist_name:len, danceability:age_actual)
 
 rename_with(music_cleaned, toupper)
 
 ```
 
+# export cleaned data set
+```{r}
+write.csv(music_cleaned, "~/Documents/EDA/EDA-project/clean-data/tcc_ceds_music_cleaned.csv")
+```
 
 
 
