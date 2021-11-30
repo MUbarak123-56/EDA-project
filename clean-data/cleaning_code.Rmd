@@ -8,34 +8,34 @@ output: html_document
 
 ```{r}
 library(readr)
+library(janitor)
+music <- read_csv("~/Documents/EDA/tcc_ceds_music.csv")%>%
+  clean_names()
+View(music)
 
-tcc_ceds_music <- read_csv("~/Documents/EDA/tcc_ceds_music.csv")
-tcc_ceds_music_cleaned <- read_csv("~/Documents/EDA/tcc_ceds_music.csv")
-
-View(tcc_ceds_music)
 ```
 
 # Checking Assertions
 
 ```{r}
-library(dplyr)
+library(tidyverse)
 library(assertr)
-library(ggplot2)
-library(tidyr)
+library(corrplot)
+
 
 #initial exploration of variables
-class(tcc_ceds_music)
+class(music)
 
-tcc_ceds_music%>%
+music%>%
   summarise(min(release_date), max(release_date))
 
 #check that values are between 0-1 for acousticness, instrumentalness, valence, energy, and age
-tcc_ceds_music%>%
+music%>%
   assert(within_bounds(0,1), acousticness:energy)%>%
   assert(within_bounds(0,1), age)
 
 #check for NAs
-tcc_ceds_music%>%
+music%>%
   assert(not_na, artist_name:age)
 
 ```
@@ -56,18 +56,43 @@ tcc_ceds_music_cleaned$energy = as.numeric(tcc_ceds_music_cleaned$energy)
 # Delete NAs
 
 ```{r}
-tcc_ceds_music_cleaned = na.omit(tcc_ceds_music_cleaned)
+music = na.omit(music)
+#Min-Max Scaling 
+normalize <- function(x) {
+return ((x - min(x)) / (max(x) - min(x)))
+}
+
+Length_norm=normalize(music$len)
+
+music<- music %>%
+  mutate(Length_norm)
 ```
 
-# Delete Wrong/Useless Information
 
-In variable 'genre', there are three possible wrong/useless types.
-
+remove unwanted variables after checking correlations
 ```{r}
-unique(tcc_ceds_music$genre)
+music <- music %>%
+  select(-x1)
+music <- music %>% 
+  mutate(id = 1) %>% 
+  mutate(id = cumsum(id))
+head(music)
 
-tcc_ceds_music_cleaned = tcc_ceds_music_cleaned %>%
-  filter(genre == "pop"|genre == "56"|genre == "hip hop"|genre == "country"|genre == "blues"|genre == "jazz"|genre == "reggae"|genre == "rock")
+new_t <- music %>% 
+  select(dating:energy)
+colnames(new_t)
+
+new_t$valence = as.numeric(new_t$valence)
+new_t$energy = as.numeric(new_t$energy)
+
+# delete NAs
+
+new_t = na.omit(new_t)
+
+# scatterplot matrix of the audio feature parameters
+corrplot(cor(new_t))
+
+
 ```
 
 In variable 'topic', there are several possible wrong/useless types.
