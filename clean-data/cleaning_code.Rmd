@@ -4,18 +4,21 @@ output: html_document
 ---
 
 
-import data
+# Import Data
+
 ```{r}
 library(readr)
 tcc_ceds_music <- read_csv("~/Documents/EDA/tcc_ceds_music.csv")
 View(tcc_ceds_music)
 ```
 
-checking assertions
+# Checking Assertions
+
 ```{r}
 library(dplyr)
 library(assertr)
 library(ggplot2)
+library(tidyr)
 
 #initial exploration of variables
 class(tcc_ceds_music)
@@ -34,12 +37,44 @@ tcc_ceds_music%>%
 
 ```
 
+# Remove Unwanted Variables after Checking Correlations
 
-remove unwanted variables after checking correlations
 ```{r}
 
 ```
 
+# Change Characteristic Types to Numeric Types for Variables
+
+```{r}
+tcc_ceds_music_cleaned$valence = as.numeric(tcc_ceds_music_cleaned$valence)
+tcc_ceds_music_cleaned$energy = as.numeric(tcc_ceds_music_cleaned$energy)
+```
+
+# Delete NAs
+
+```{r}
+tcc_ceds_music_cleaned = na.omit(tcc_ceds_music_cleaned)
+```
+
+# Delete Wrong/Useless Information
+
+In variable 'genre', there are three possible wrong/useless types.
+
+```{r}
+unique(tcc_ceds_music$genre)
+
+tcc_ceds_music_cleaned = tcc_ceds_music_cleaned %>%
+  filter(genre == "pop"|genre == "56"|genre == "hip hop"|genre == "country"|genre == "blues"|genre == "jazz"|genre == "reggae"|genre == "rock")
+```
+
+In variable 'topic', there are several possible wrong/useless types.
+
+```{r}
+unique(tcc_ceds_music$topic)
+
+tcc_ceds_music_cleaned = tcc_ceds_music_cleaned %>%
+  filter(topic == "sadness"|topic == "world/life"|topic == "music"|topic == "romantic"|topic == "violence"|topic == "obscene"|topic == "night/time"|topic == "feelings")
+```
 
 
 
