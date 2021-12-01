@@ -56,7 +56,7 @@ ggplot(music_bar) + ## Plotting graphic
 correlation <- function(vec, x, y) {
   val <- c()
   for (i in seq_along(vec)) {
-    gen <- data %>% 
+    gen <- music %>% 
       filter(genre == vec[i])
     val[i] <- cor(gen[,x], gen[,y], use="everything",
         method="pearson")
