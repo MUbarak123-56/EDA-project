@@ -72,7 +72,6 @@ corrplot(cor(new_t))
 ```{r}
 music_cleaned<-music%>%
   select(id, artist_name:len, danceability:age_actual)
-music_cleaned <- rename_with(music_cleaned, toupper)
 
 ```
 
