@@ -9,7 +9,7 @@ output: html_document
 ```{r}
 library(readr)
 library(janitor)
-music <- read_csv("~/Documents/EDA/tcc_ceds_music.csv")%>%
+music <- read_csv("~/Projects/Vandy Assignments/EDA-project/raw-data/tcc_ceds_music.csv")%>%
   clean_names()
 View(music)
 ```
@@ -72,14 +72,13 @@ corrplot(cor(new_t))
 ```{r}
 music_cleaned<-music%>%
   select(id, artist_name:len, danceability:age_actual)
-
-rename_with(music_cleaned, toupper)
+music_cleaned <- rename_with(music_cleaned, toupper)
 
 ```
 
 # export cleaned data set
 ```{r}
-write.csv(music_cleaned, "~/Documents/EDA/EDA-project/clean-data/tcc_ceds_music_cleaned.csv")
+write.csv(music_cleaned, "~/Projects/Vandy Assignments/EDA-project/clean-data/tcc_ceds_music_clean.csv")
 ```
 
 
