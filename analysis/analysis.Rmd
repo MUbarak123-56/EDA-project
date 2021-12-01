@@ -19,7 +19,7 @@ library(tidyr)
 ### Importing data
 
 ```{r}
-music <- read_csv("~/Projects/Vandy Assignments/EDA-project/clean-data/tcc_ceds_music_cleaned.csv")
+music <- read_csv("~/EDA-project/clean-data/tcc_ceds_music_cleaned.csv")
 ```
 
 ## Analysis
@@ -162,7 +162,11 @@ radar2g <- radar2 %>% group_by(genre) %>% summarize(Energy = mean(energy), Loudn
 ggradar(radar2g, values.radar = c('', '', ''), legend.title = "Genre", legend.text.size = 10, axis.label.size = 3)
 ```
 
-
+```{r}
+normalize <- function(x) {
+return ((x - min(x)) / (max(x) - min(x)))
+}
+```
 
 ```{r}
 music_new <- music %>% select(genre, track_name, lyrics) %>% group_by(genre) %>% unnest_tokens(word, lyrics)
@@ -181,7 +185,7 @@ df_sentiments_filtered
 #### Sentimental differences across genres
 
 ```{r, fig.width = 10, fig.height = 8}
-(genresentiments <- df_sentiments_filtered %>% pivot_wider(names_from = sentiment, values_from = count))
+(genresentiments <- df_sentiments_filtered %>% spread(key = sentiment, value = count))
 ggradar(genresentiments, values.radar = c('', '', ''), legend.title = "Genre", legend.text.size =8, axis.label.size = 3)
 ```
 
@@ -255,7 +259,7 @@ ggplot(music) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-### 
+### Songs' Duration by Genre
 
 ```{r}
 ggplot(music) +
