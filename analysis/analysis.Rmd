@@ -198,7 +198,7 @@ ggradar(genresentiments, values.radar = c('', '', ''), legend.title = "Genre", l
 ```
 
 
-### Genre changes on average according to different musical features
+### Genre changes on average over time according to different musical features
 
 #### Change in Loudness over time (1950-2019) across genre
 
