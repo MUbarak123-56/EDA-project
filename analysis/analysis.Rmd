@@ -14,6 +14,7 @@ library(assertr)
 library(ggradar)
 library(tidytext)
 library(tidyr)
+library(corrplot)
 ```
 
 ### Importing data
@@ -175,9 +176,7 @@ sentiments <- get_sentiments("nrc")
 
 df_sentiments <- music_new %>% left_join(sentiments)
 
-df_sentiments_filtered <- df_sentiments %>% filter(!is.na(sentiment)) %>% group_by(genre, sentiment) %>% summarize(count = n())
-
-df_sentiments_filtered$count <- normalize(df_sentiments_filtered$count)
+df_sentiments_filtered <- df_sentiments %>% filter(!is.na(sentiment)) %>% group_by(genre, sentiment) %>% summarize(count = n()) %>% mutate(total = sum(count)) %>% mutate(ratio_sentiment = count/total) %>% select(-count, - total)
 
 df_sentiments_filtered
 ```
@@ -185,7 +184,7 @@ df_sentiments_filtered
 #### Sentimental differences across genres
 
 ```{r, fig.width = 10, fig.height = 8}
-(genresentiments <- df_sentiments_filtered %>% spread(key = sentiment, value = count))
+(genresentiments <- df_sentiments_filtered %>% spread(key = sentiment, value = ratio_sentiment))
 ggradar(genresentiments, values.radar = c('', '', ''), legend.title = "Genre", legend.text.size =8, axis.label.size = 3)
 ```
 
