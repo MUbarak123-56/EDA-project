@@ -11,6 +11,7 @@ library(tidyverse)
 library(janitor)
 library(readr)
 library(assertr)
+library(corrplot)
 library(ggradar)
 library(tidytext)
 library(tidyr)
@@ -25,11 +26,6 @@ music <- read_csv("~/EDA-project/clean-data/tcc_ceds_music_cleaned.csv")
 ## Analysis
 
 ### Which Genre of music has been produced the most?
-
-```{r}
-musiccor <- music %>% select(danceability:Length_norm, -topic)
-corrplot(cor(musiccor), method = "square", tl.cex = 0.9)
-```
 
 
 ```{r}
@@ -49,6 +45,13 @@ ggplot(music_bar) + ## Plotting graphic
 ```
 
 ### Correlational Analysis of Musical Features across Genres
+
+#### Correlation Coefficient matrix of all the variables 
+
+```{r}
+musiccor <- music %>% select(danceability:Length_norm, -topic)
+corrplot(cor(musiccor), method = "square", tl.cex = 0.9)
+```
 
 #### Creating function for calculating correlation
 
@@ -159,7 +162,7 @@ radar2 <- music %>% select(genre, energy, loudness, valence, danceability, acous
 
 radar2g <- radar2 %>% group_by(genre) %>% summarize(Energy = mean(energy), Loudness = mean(loudness), Valence = mean(valence), Danceability = mean(danceability), Acoustincness = mean(acousticness), Instrumentalness = mean(instrumentalness), Length = mean(Length_norm))
 
-ggradar(radar2g, values.radar = c('', '', ''), legend.title = "Genre", legend.text.size = 10, axis.label.size = 3)
+ggradar(radar2g, values.radar = c('', '', ''), legend.title = "Genre", legend.text.size = 10, axis.label.size = 3, plot.title = "Audio Parameters Across Genres")
 ```
 
 ```{r}
@@ -186,7 +189,8 @@ df_sentiments_filtered
 
 ```{r, fig.width = 10, fig.height = 8}
 (genresentiments <- df_sentiments_filtered %>% spread(key = sentiment, value = count))
-ggradar(genresentiments, values.radar = c('', '', ''), legend.title = "Genre", legend.text.size =8, axis.label.size = 3)
+ggradar(genresentiments, values.radar = c('', '', ''), legend.title = "Genre", legend.text.size =8, axis.label.size = 3, plot.title = "Sentiments Across Genres")
+?ggradar
 ```
 
 
@@ -244,7 +248,9 @@ ggplot(music_agg) +
 ```
 
 
-### How the genres vary with regards to the topics affiliated to the song
+### How the genres' characteristics vary with regards to the song
+
+#### How Genres differ in terms of Topic
 
 ```{r, fig.width = 12, fig.height = 9}
 music_count <- music %>% 
@@ -259,7 +265,7 @@ ggplot(music) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-### Songs' Duration by Genre
+#### Songs' Duration by Genre
 
 ```{r}
 ggplot(music) +
