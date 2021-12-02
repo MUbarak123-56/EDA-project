@@ -1,0 +1,285 @@
+---
+title: "Analysis"
+output: html_document
+authors: "Anna Cameron, Enya Tan, Mubarak Ganiyu, Sriram Kannan"
+---
+
+### Loading packages
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(readr)
+library(assertr)
+library(corrplot)
+library(ggradar)
+library(tidytext)
+library(tidyr)
+library(corrplot)
+```
+
+### Importing data
+
+```{r}
+music <- read_csv("~/EDA-project/clean-data/tcc_ceds_music_cleaned.csv")
+```
+
+## Analysis
+
+### Which Genre of music has been produced the most?
+
+
+```{r}
+music_bar <- music %>% 
+  count(genre) %>% # counting number of genres
+  na.omit() %>% # removing NA values
+  ungroup() %>% 
+  mutate(prop = (n/sum(n))*100) %>% # calculating proportions of accidents
+  mutate(label = as.character(prop)) 
+music_bar$label <- substr(music_bar$label, 0, 4) # converting proportions into characters for labelling
+ggplot(music_bar) + ## Plotting graphic
+  geom_bar(aes(x = "", y = prop, fill = genre), stat= "identity", width = 1) +
+  labs(title = "Tracks by Genre", fill = "Genre") +
+  coord_polar("y", start=0) +
+  theme_void() +
+  theme(plot.title = element_text(hjust=0.5))
+```
+
+### Correlational Analysis of Musical Features across Genres
+
+#### Correlation Coefficient matrix of all the variables 
+
+```{r}
+musiccor <- music %>% select(danceability:Length_norm, -topic)
+corrplot(cor(musiccor), method = "square", tl.cex = 0.9)
+```
+
+#### Creating function for calculating correlation
+
+```{r}
+correlation <- function(vec, x, y) {
+  val <- c()
+  for (i in seq_along(vec)) {
+    gen <- music %>% 
+      filter(genre == vec[i])
+    val[i] <- cor(gen[,x], gen[,y], use="everything",
+        method="pearson")
+  }
+  df <- data.frame(genre = vec, corr = val, abs_corr = abs(val))
+  return(df)
+}
+```
+
+#### Valence and Danceability correlation across different genres
+
+```{r, fig.width = 10, fig.height = 8}
+gen_vec <- unique(music$genre)
+new_df <- correlation(gen_vec, "valence", "danceability")
+new_df %>% 
+  arrange(desc(corr))
+
+ggplot(new_df) +
+  geom_bar(aes(x = reorder(genre, -abs_corr), y = abs_corr), stat = "identity",
+   fill = "skyblue", alpha = 0.7) +
+  labs(x = "Genre", y = "Valence and Danceability Correlation",
+       title = "Valence and Danceability Correlation across different Genres") +
+  theme_light() +
+  theme(plot.title = element_text(hjust =0.5))
+  
+```
+
+#### Age and Acousticness correlation across different genres
+
+```{r, fig.width = 10, fig.height = 8}
+new_df <- correlation(gen_vec, "age", "acousticness")
+new_df %>% 
+  arrange(desc(corr))
+
+ggplot(new_df) +
+  geom_bar(aes(x = reorder(genre, -abs_corr), y = abs_corr), stat = "identity",
+   fill = "skyblue", alpha = 0.7) +
+  labs(x = "Genre", y = "Age and Acousticness Correlation",
+       title = "Age and Acousticness Correlation across different Genres") +
+  theme_light() +
+  theme(plot.title = element_text(hjust =0.5))
+```
+
+#### Age and Energy correlation across different genres
+
+```{r, fig.width = 10, fig.height = 8}
+new_df <- correlation(gen_vec, "age", "energy")
+new_df %>% 
+  arrange(desc(corr))
+
+ggplot(new_df) +
+  geom_bar(aes(x = reorder(genre, -abs_corr), y = abs_corr), stat = "identity",
+   fill = "skyblue", alpha = 0.7) +
+  labs(x = "Genre", y = "Age and Energy Correlation",
+       title = "Age and Energy Correlation across different Genres") +
+  theme_light() +
+  theme(plot.title = element_text(hjust =0.5))
+```
+
+#### Age and Loudness correlation across different genres
+
+```{r, fig.width = 10, fig.height = 8}
+new_df <- correlation(gen_vec, "age", "loudness")
+new_df %>% 
+  arrange(desc(corr))
+
+ggplot(new_df) +
+  geom_bar(aes(x = reorder(genre, -abs_corr), y = abs_corr), stat = "identity",
+   fill = "skyblue", alpha = 0.7) +
+  labs(x = "Genre", y = "Age and Loudness Correlation",
+       title = "Age and Loudness Correlation across different Genres") +
+  theme_light() +
+  theme(plot.title = element_text(hjust =0.5))
+```
+
+#### Energy and Loudness correlation across different genres
+
+```{r, fig.width = 10, fig.height = 8}
+gen_vec <- unique(music$genre)
+new_df <- correlation(gen_vec, "energy", "loudness")
+new_df %>% 
+  arrange(desc(corr))
+
+ggplot(new_df) +
+  geom_bar(aes(x = reorder(genre, -abs_corr), y = abs_corr), stat = "identity",
+   fill = "skyblue", alpha = 0.7) +
+  labs(x = "Genre", y = "Energy and Loudness Correlation",
+       title = "Energy and Loudness Correlation across different Genres") +
+  theme_light() +
+  theme(plot.title = element_text(hjust =0.5))
+  
+```
+
+### Exploring how genres differ on average based on different features
+
+#### Audio parameter differences across genres
+
+```{r, fig.width = 10, fig.height = 8}
+radar2 <- music %>% select(genre, energy, loudness, valence, danceability, acousticness, instrumentalness, Length_norm)
+
+radar2g <- radar2 %>% group_by(genre) %>% summarize(Energy = mean(energy), Loudness = mean(loudness), Valence = mean(valence), Danceability = mean(danceability), Acoustincness = mean(acousticness), Instrumentalness = mean(instrumentalness), Length = mean(Length_norm))
+
+ggradar(radar2g, values.radar = c('', '', ''), legend.title = "Genre", legend.text.size = 10, axis.label.size = 3, plot.title = "Audio Parameters Across Genres")
+```
+
+```{r}
+normalize <- function(x) {
+return ((x - min(x)) / (max(x) - min(x)))
+}
+```
+
+```{r}
+music_new <- music %>% select(genre, track_name, lyrics) %>% group_by(genre) %>% unnest_tokens(word, lyrics)
+
+sentiments <- get_sentiments("nrc")
+
+df_sentiments <- music_new %>% left_join(sentiments)
+
+df_sentiments_filtered <- df_sentiments %>% filter(!is.na(sentiment)) %>% group_by(genre, sentiment) %>% summarize(count = n()) %>% mutate(total = sum(count)) %>% mutate(ratio_sentiment = count/total) %>% select(-count, - total)
+
+df_sentiments_filtered
+```
+
+#### Sentimental differences across genres
+
+```{r, fig.width = 10, fig.height = 8}
+<<<<<<< HEAD
+(genresentiments <- df_sentiments_filtered %>% spread(key = sentiment, value = count))
+ggradar(genresentiments, values.radar = c('', '', ''), legend.title = "Genre", legend.text.size =8, axis.label.size = 3, plot.title = "Sentiments Across Genres")
+?ggradar
+=======
+(genresentiments <- df_sentiments_filtered %>% spread(key = sentiment, value = ratio_sentiment))
+ggradar(genresentiments, values.radar = c('', '', ''), legend.title = "Genre", legend.text.size =8, axis.label.size = 3)
+>>>>>>> f32a5c63039d6eeb3d8d69bfc58d5c7ebbfe7e98
+```
+
+
+### Genre changes on average according to different musical features
+
+#### Change in Loudness over time (1950-2019) across genre
+
+```{r, fig.width = 12, fig.height = 9}
+music_agg <- music %>% 
+  group_by(genre, release_date) %>% 
+  summarize(mean = mean(loudness))
+ggplot(music_agg) + 
+  geom_line(aes(x = release_date, y = mean, color = genre)) +
+  geom_point(aes(x = release_date, y = mean, color = genre)) +
+  labs(title="Change in Loudness over Time (1950-2019) across Genre",
+       x="Year",
+       y= "Loudness") +
+  scale_x_continuous(breaks= seq(1950, 2020, 25)) +
+  theme_light() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+#### Change in Acousticness over time (1950-2019) across genre
+
+```{r, fig.width = 12, fig.height = 9}
+music_agg <- music %>% 
+  group_by(genre, release_date) %>% 
+  summarize(mean = mean(acousticness))
+ggplot(music_agg) + 
+  geom_line(aes(x = release_date, y = mean, color = genre)) +
+  geom_point(aes(x = release_date, y = mean, color = genre)) +
+  labs(title="Change in Acousticness over Time (1950-2019) across Genre",
+       x="Year",
+       y= "Energy") +
+  scale_x_continuous(breaks= seq(1950, 2020, 25)) +
+  theme_light() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+#### Change in Energy over time (1950-2019) across genre
+
+```{r, fig.width = 12, fig.height = 9}
+music_agg <- music %>% 
+  group_by(genre, release_date) %>% 
+  summarize(mean = mean(energy))
+ggplot(music_agg) + 
+  geom_line(aes(x = release_date, y = mean, color = genre)) +
+  geom_point(aes(x = release_date, y = mean, color = genre)) +
+  labs(title="Change in Energy over Time (1950-2019) across Genre",
+       x="Year",
+       y= "Energy") +
+  scale_x_continuous(breaks= seq(1950, 2020, 25)) +
+  theme_light() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+### How the genres' characteristics vary with regards to the song
+
+#### How Genres differ in terms of Topic
+
+```{r, fig.width = 12, fig.height = 9}
+music_count <- music %>% 
+  group_by(genre) %>% 
+  summarize(count = n())
+music_count
+ggplot(music) +
+  geom_bar(aes(x = genre, fill = topic), position="fill",
+           color = "rosybrown", alpha = 0.7) +
+  labs(x = "Genre", title = "How Genres differ in terms of Topic", y = "proportion") +
+  theme_light() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+#### Songs' Duration by Genre
+
+```{r}
+ggplot(music) +
+  geom_histogram(aes(x = len)) + labs(title = "Distribution of Length of Songs", x = "Length of Songs", y = "Frequency") + theme(plot.title = element_text(hjust = 0.5)) 
+```
+
+```{r, fig.width = 12, fig.height = 9}
+ggplot(music) +
+  geom_boxplot(aes(y = len, x = genre, color = genre), fill = "gray45") +
+  labs(x = "Genre", y = "Length", title = "Distributions of Length of Songs by Genre") +
+  theme_light() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
