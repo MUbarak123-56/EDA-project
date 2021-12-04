@@ -187,7 +187,7 @@ df_sentiments_filtered
 #### Sentimental differences across genres
 
 ```{r, fig.width = 10, fig.height = 8}
-(genresentiments <- df_sentiments_filtered %>% spread(key = sentiment, value = count))
+(genresentiments <- df_sentiments_filtered %>% spread(key = sentiment, value = ratio_sentiment))
 ggradar(genresentiments, values.radar = c('', '', ''), legend.title = "Genre", legend.text.size =8, axis.label.size = 3, plot.title = "Sentiments Across Genres")
 ```
 
