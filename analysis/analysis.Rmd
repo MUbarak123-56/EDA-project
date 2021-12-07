@@ -285,12 +285,12 @@ ggplot(music) +
 ggplot(tcc_ceds_music_cleaned, aes(x=genre, y=danceability, fill=genre)) + 
   geom_violin(width=1)+
   geom_boxplot(width=0.1, color="white", alpha=0.2)+
-  labs(x="Danceability", y="Genre", title = "")
+  labs(x="Genre", y="Danceability ", title = "Danceability Scores by Genre")
 
 #energy 
 ggplot(tcc_ceds_music_cleaned, aes(x=genre, y=energy, fill=genre)) + 
   geom_violin(width=1)+
   geom_boxplot(width=0.1, color="white", alpha=0.2)+
-  labs(x="Energy", y="Genre", title = "")
+  labs(x="Genre", y="Energy", title = "Energy Scores by Genre")
 ```
 
