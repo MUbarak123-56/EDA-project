@@ -3,7 +3,7 @@ title: "master project file"
 output: html_document
 ---
 
-
+#import data
 ```{r}
 library(readr)
 music_cleaned <- read_csv("clean-data/tcc_ceds_music_cleaned.csv")
